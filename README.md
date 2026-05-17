@@ -6,32 +6,46 @@
 
 ## 📦 安装方法
 
-### 方法一：开发者模式加载（推荐）
+### 方法一：直接下载安装（推荐）
 
-1. **下载代码**
+适合普通用户，无需安装 Node.js 或执行命令。
+
+1. **下载构建好的扩展包**
+   - 访问本仓库的 [Releases 页面](https://github.com/ZongziForu/Wechat-Channel-AI-Editor/releases)
+   - 下载最新版本的 `wechat-editor-v1.x.x.zip`
+   - 将 zip 解压到任意文件夹（如桌面）
+
+2. **Chrome 加载扩展**
+   - 打开 Chrome，访问 `chrome://extensions/`
+   - 开启右上角「开发者模式」
+   - 点击「加载已解压的扩展程序」
+   - 选择刚才解压出来的文件夹（包含 `manifest.json` 的目录）
+
+3. **验证安装**
+   - 扩展图标应出现在浏览器右上角
+   - 进入微信公众号编辑页面即可使用
+
+### 方法二：从源码构建（开发者）
+
+适合需要修改代码或参与开发的开发者。
+
+1. **下载源码**
    ```bash
-   git clone https://github.com/your-repo/wechat-editor-plugin.git
-   cd wechat-editor-plugin
+   git clone https://github.com/ZongziForu/Wechat-Channel-AI-Editor.git
+   cd Wechat-Channel-AI-Editor
+   ```
+
+2. **安装依赖并构建**
+   ```bash
    npm install
    npm run build
    ```
 
-2. **Chrome加载扩展**
+3. **Chrome 加载扩展**
    - 打开 Chrome，访问 `chrome://extensions/`
    - 开启右上角「开发者模式」
    - 点击「加载已解压的扩展程序」
-   - 选择项目根目录（包含 `manifest.json` 的目录）
-
-3. **验证安装**
-   - 扩展图标应出现在浏览器右上角
-   - 点击图标可打开设置页面
-
-### 方法二：构建后加载
-
-如果已获取构建好的文件：
-
-1. 解压缩文件到任意目录
-2. 按方法二步骤 2-3 加载扩展
+   - 选择项目下的 `dist` 文件夹
 
 ---
 
