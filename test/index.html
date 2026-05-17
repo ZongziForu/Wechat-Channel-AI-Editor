@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>本地测试页</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .edui-toolbar { background: #f0f0f0; padding: 8px; margin-bottom: 8px; }
+    .edui-editor-body { border: 1px solid #ccc; min-height: 200px; padding: 12px; }
+  </style>
+</head>
+<body>
+  <h3>本地扩展测试页（模拟微信编辑器结构）</h3>
+  <div class="edui-toolbar">
+    <button>加粗</button>
+    <button>斜体</button>
+    <!-- content.ts 会在此处注入「切换HTML源码」按钮 -->
+  </div>
+  <div class="edui-editor-body">
+    <p>这是一段<strong>测试内容</strong>，用于验证HTML源码模式切换功能。</p>
+    <p style="color:#07c160;">绿色文字示例</p>
+  </div>
+  <p style="margin-top:16px;color:#999;font-size:12px;">
+    加载扩展后，工具栏会出现「切换HTML源码」按钮。<br>
+    此页面仅用于本地调试，不代表真实微信编辑器。
+  </p>
+</body>
+</html>

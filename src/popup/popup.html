@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <title>API 设置</title>
+  <style>
+    body { font-family: sans-serif; width: 300px; padding: 16px; }
+    label { display: block; margin-top: 10px; font-size: 13px; color: #333; }
+    input, select { width: 100%; padding: 6px; margin-top: 4px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; font-size: 13px; }
+    button { margin-top: 14px; width: 100%; padding: 8px; background: #07c160; color: #fff; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+    #status { margin-top: 8px; font-size: 12px; color: #07c160; text-align: center; }
+  </style>
+</head>
+<body>
+  <h3 style="margin:0 0 12px;font-size:15px;">API 设置</h3>
+
+  <label>API Key
+    <input type="password" id="apiKey" placeholder="sk-..." />
+  </label>
+
+  <label>Base URL
+    <input type="text" id="baseUrl" placeholder="https://api.anthropic.com" />
+  </label>
+
+  <label>模型
+    <select id="model">
+      <option value="claude-opus-4-6">Claude Opus 4.6 (Anthropic)</option>
+      <option value="claude-sonnet-4-6">Claude Sonnet 4.6 (Anthropic)</option>
+      <option value="moonshot-v1-8k">Kimi moonshot-v1-8k</option>
+      <option value="moonshot-v1-32k">Kimi moonshot-v1-32k</option>
+    </select>
+  </label>
+
+  <button id="saveBtn">保存设置</button>
+  <div id="status"></div>
+
+  <script type="module" src="popup.ts"></script>
+</body>
+</html>
