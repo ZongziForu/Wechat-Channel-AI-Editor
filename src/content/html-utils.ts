@@ -16,14 +16,6 @@ export function formatHtml(html: string): string {
     'link', 'meta', 'param', 'source', 'track', 'wbr'
   ]);
 
-  // 内联标签（这些标签的内容不换行）
-  const inlineTags = new Set([
-    'a', 'abbr', 'acronym', 'b', 'bdo', 'big', 'br', 'cite', 'code',
-    'dfn', 'em', 'i', 'img', 'input', 'kbd', 'label', 'map', 'object',
-    'q', 'samp', 'script', 'select', 'small', 'span', 'strong', 'sub',
-    'sup', 'textarea', 'time', 'tt', 'var'
-  ]);
-
   // 在单词边界处分割长文本
   function wrapText(text: string, baseIndent: string): string {
     if (text.length <= MAX_LINE_LENGTH) {
@@ -97,86 +89,6 @@ export function formatHtml(html: string): string {
   }
 
   return formatted.trim();
-}
-
-/**
- * HTML语法高亮
- * 轻量级实现，使用正则表达式进行语法着色
- */
-export function highlightHtml(html: string): string {
-  // 首先进行HTML实体转义
-  let highlighted = html
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;');
-
-  // 临时标记，避免重复处理
-  const placeholders: Map<string, string> = new Map();
-  let placeholderId = 0;
-
-  function addPlaceholder(content: string): string {
-    const key = `__PLACEHOLDER_${placeholderId++}__`;
-    placeholders.set(key, content);
-    return key;
-  }
-
-  // 1. 处理注释（最先处理，避免被其他规则干扰）
-  highlighted = highlighted.replace(
-    /(&lt;!--[\s\S]*?--&gt;)/g,
-    (match) => addPlaceholder(`<span class="token comment">${match}</span>`)
-  );
-
-  // 2. 处理DOCTYPE声明
-  highlighted = highlighted.replace(
-    /(&lt;!DOCTYPE[^&]*?&gt;)/gi,
-    (match) => addPlaceholder(`<span class="token doctype">${match}</span>`)
-  );
-
-  // 3. 处理CDATA
-  highlighted = highlighted.replace(
-    /(&lt;!\[CDATA\[[\s\S]*?\]\]&gt;)/g,
-    (match) => addPlaceholder(`<span class="token cdata">${match}</span>`)
-  );
-
-  // 4. 处理标签内的内容（分步处理）
-  // 先提取完整标签进行详细解析
-  highlighted = highlighted.replace(
-    /(&lt;)(\/?)([a-zA-Z][a-zA-Z0-9-]*)([^&]*?)(&gt;)/g,
-    (match, lt, slash, tagName, attrs, gt) => {
-      // 处理属性
-      let processedAttrs = attrs;
-
-      // 属性名
-      processedAttrs = processedAttrs.replace(
-        /\s+([a-zA-Z-:]+)(=)/g,
-        ' <span class="token attr-name">$1</span><span class="token punctuation">$2</span>'
-      );
-
-      // 属性值（字符串）
-      processedAttrs = processedAttrs.replace(
-        /"([^"]*)"/g,
-        '<span class="token string">"$1"</span>'
-      );
-
-      // 属性值（单引号）
-      processedAttrs = processedAttrs.replace(
-        /'([^']*)'/g,
-        '<span class="token string">\'$1\'</span>'
-      );
-
-      return `<span class="token punctuation">${lt}${slash}</span><span class="token tag">${tagName}</span>${processedAttrs}<span class="token punctuation">${gt}</span>`;
-    }
-  );
-
-  // 5. 处理script和style标签内的内容（如果有的话）
-  // 使用占位符保护
-
-  // 6. 还原所有占位符
-  placeholders.forEach((value, key) => {
-    highlighted = highlighted.replace(key, value);
-  });
-
-  return highlighted;
 }
 
 /**

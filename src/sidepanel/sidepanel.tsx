@@ -1,7 +1,7 @@
 // sidepanel.tsx - AI排版助手侧边栏，含可折叠设置面板和富文本编辑支持
 import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
-import { callAI, callAIStream, cleanAIResponse, partialCleanAIResponse, callAIWithRetry, getApiConfig } from '../utils/api';
+import { callAI, callAIStream, cleanAIResponse, partialCleanAIResponse, callAIWithRetry, getApiConfig, getSystemPrompt } from '../utils/api';
 
 // 预设提示词类型
 interface Preset {
@@ -637,9 +637,7 @@ function SidePanel() {
 
       // 获取自定义系统提示词
       const config = await getApiConfig();
-      const systemPrompt = config.customPrompt
-        ? `${config.basePrompt || '你是微信公众号排版专家。'}\n\n${config.customPrompt}`
-        : undefined;
+      const systemPrompt = config.customPrompt ? getSystemPrompt(config.customPrompt) : undefined;
 
       // 所有模式都使用流式传输以显示进度
       await callAIStream(contextPrompt, content, (chunk) => {

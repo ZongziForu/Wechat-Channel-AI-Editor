@@ -35,6 +35,7 @@ coverage/
 # Chrome extension private key & packed extension
 *.pem
 *.crx
+*.zip
 
 # Claude local settings
 .claude/

@@ -1,7 +1,7 @@
 // content.ts - 注入微信公众号编辑器，添加HTML源码模式切换按钮和富文本编辑支持
 
 import { LazyHighlightEditor, createHtmlEditor } from './html-editor';
-import { formatHtml, minifyHtml } from './html-utils';
+import { formatHtml } from './html-utils';
 
 let isHtmlMode = false;
 let richEditor: Element | null = null;
@@ -159,22 +159,8 @@ async function replaceWithSavedSelection(newHtml: string): Promise<{ success: bo
       editor.focus();
 
       // 方法1：完全清空并重建内容（最彻底）
-      while (editor.firstChild) {
-        editor.removeChild(editor.firstChild);
-      }
-
-      // 创建临时容器解析HTML
-      const tempDiv = document.createElement('div');
-      tempDiv.innerHTML = newHtml;
-
-      // 将解析后的节点插入编辑器
-      while (tempDiv.firstChild) {
-        editor.appendChild(tempDiv.firstChild);
-      }
-
-      // 触发编辑器同步事件
-      editor.dispatchEvent(new Event('input', { bubbles: true }));
-      editor.dispatchEvent(new Event('keyup', { bubbles: true }));
+      replaceChildren(editor, newHtml);
+      syncEditor(editor);
 
       savedSelection = null;
       return { success: true, method: 'dom_replace_full' };
@@ -193,7 +179,7 @@ async function replaceWithSavedSelection(newHtml: string): Promise<{ success: bo
         const success = document.execCommand('insertHTML', false, newHtml);
 
         if (success) {
-          editor.dispatchEvent(new Event('input', { bubbles: true }));
+          syncEditor(editor);
           savedSelection = null;
           return { success: true, method: 'exec_command_full' };
         }
@@ -286,6 +272,31 @@ function getEditorContainer(): Element | null {
   return content?.parentElement || document.querySelector('#js_editor') || content;
 }
 
+// 清空目标元素并用 HTML 字符串重建子节点
+function replaceChildren(target: HTMLElement, html: string) {
+  while (target.firstChild) {
+    target.removeChild(target.firstChild);
+  }
+  const tempDiv = document.createElement('div');
+  tempDiv.innerHTML = html;
+  while (tempDiv.firstChild) {
+    target.appendChild(tempDiv.firstChild);
+  }
+}
+
+// 触发编辑器同步事件，可选恢复滚动位置
+function syncEditor(el: HTMLElement, scrollTop?: number) {
+  el.dispatchEvent(new Event('input', { bubbles: true }));
+  el.dispatchEvent(new Event('keyup', { bubbles: true }));
+  if (scrollTop !== undefined) {
+    el.scrollTop = scrollTop;
+  }
+  setTimeout(() => {
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    el.dispatchEvent(new Event('change', { bubbles: true }));
+  }, 100);
+}
+
 // 写入 HTML 到 contenteditable 编辑器，触发数据模型同步
 function applyHtmlToEditor(html: string) {
   const el = getEditorContent();
@@ -298,33 +309,8 @@ function applyHtmlToEditor(html: string) {
 
   // 方法1：尝试直接清空并设置内容（最彻底）
   try {
-    // 先清空所有内容
-    while (el.firstChild) {
-      el.removeChild(el.firstChild);
-    }
-
-    // 创建临时容器解析HTML
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = html;
-
-    // 将解析后的节点插入编辑器
-    while (tempDiv.firstChild) {
-      el.appendChild(tempDiv.firstChild);
-    }
-
-    // 触发多种事件确保 ProseMirror 同步
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('keyup', { bubbles: true }));
-
-    // 恢复滚动位置
-    el.scrollTop = scrollTop;
-
-    // 额外：尝试触发微信编辑器的保存机制
-    setTimeout(() => {
-      el.dispatchEvent(new Event('input', { bubbles: true }));
-      el.dispatchEvent(new Event('change', { bubbles: true }));
-    }, 100);
-
+    replaceChildren(el, html);
+    syncEditor(el, scrollTop);
     return;
   } catch (e) {
     console.warn('[Apply HTML] DOM manipulation failed, falling back to execCommand:', e);
@@ -343,18 +329,7 @@ function applyHtmlToEditor(html: string) {
   // 插入新内容
   document.execCommand('insertHTML', false, html);
 
-  // 触发多种事件确保 ProseMirror 同步
-  el.dispatchEvent(new Event('input', { bubbles: true }));
-  el.dispatchEvent(new Event('keyup', { bubbles: true }));
-
-  // 恢复滚动位置
-  el.scrollTop = scrollTop;
-
-  // 额外：尝试触发微信编辑器的保存机制
-  setTimeout(() => {
-    el.dispatchEvent(new Event('input', { bubbles: true }));
-    el.dispatchEvent(new Event('change', { bubbles: true }));
-  }, 100);
+  syncEditor(el, scrollTop);
 }
 
 // 使用 Clipboard API 插入 HTML（ProseMirror 兼容方案）
@@ -737,10 +712,7 @@ async function replaceRichTextSelection(newHtml: string): Promise<boolean> {
 
     // 触发编辑器同步
     const editor = getEditorContent();
-    if (editor) {
-      editor.dispatchEvent(new Event('input', { bubbles: true }));
-      editor.dispatchEvent(new Event('keyup', { bubbles: true }));
-    }
+    if (editor) syncEditor(editor);
 
     return true;
   } catch (e) {
@@ -777,16 +749,7 @@ function replaceTargetElement(path: string[], newHtml: string): { success: boole
 
     // 触发编辑器同步
     const editor = getEditorContent();
-    if (editor) {
-      editor.dispatchEvent(new Event('input', { bubbles: true }));
-      editor.dispatchEvent(new Event('keyup', { bubbles: true }));
-
-      // 额外：尝试触发微信编辑器的保存机制
-      setTimeout(() => {
-        editor.dispatchEvent(new Event('input', { bubbles: true }));
-        editor.dispatchEvent(new Event('change', { bubbles: true }));
-      }, 100);
-    }
+    if (editor) syncEditor(editor);
 
     return { success: true, method: 'target_element' };
   } catch (e) {

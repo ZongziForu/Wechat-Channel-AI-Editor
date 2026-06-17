@@ -291,9 +291,3 @@ export function createHtmlEditor(
 
 // 保持向后兼容的导出
 export { formatHtml } from './html-utils';
-
-// 为了兼容旧代码中的 highlightHtml，提供一个简单实现
-export function highlightHtml(html: string): string {
-  // CodeMirror 不需要手动高亮，返回原字符串即可
-  return html;
-}

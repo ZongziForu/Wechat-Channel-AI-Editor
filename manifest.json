@@ -14,8 +14,7 @@
     "https://mp.weixin.qq.com/*",
     "https://api.anthropic.com/*",
     "https://api.moonshot.cn/*",
-    "https://api.kimi.com/*",
-    "https://*/*"
+    "https://api.kimi.com/*"
   ],
   "content_scripts": [
     {

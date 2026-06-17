@@ -6,7 +6,6 @@ export interface ApiConfig {
   model: string;
   protocol: 'anthropic' | 'openai';
   customPrompt?: string;
-  basePrompt?: string;
   maxTokens?: number;
 }
 
@@ -67,7 +66,6 @@ export async function getApiConfig(): Promise<ApiConfig> {
         model: result.model || '',
         protocol: result.protocol || 'anthropic',
         customPrompt: result.customPrompt || '',
-        basePrompt: DEFAULT_SYSTEM_PROMPT,
         maxTokens: result.maxTokens || 8192,
       });
     });
